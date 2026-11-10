@@ -13,15 +13,15 @@ import (
 	"api-tests-template/internal/managers/auth/models"
 	base "api-tests-template/tests"
 
-	"strings"
 	"api-tests-template/internal/utils"
+	"strings"
 )
 
 const (
-	existingAdTitle = "Ананас вкусный очень" 
-	searchBeginning = "Ананас" 
-	searchMiddle    = "вкусный" 
-	searchEnd       = "очень" 
+	existingAdTitle = "Ананас вкусный очень"
+	searchBeginning = "Ананас"
+	searchMiddle    = "вкусный"
+	searchEnd       = "очень"
 )
 
 type TestSuite struct {
