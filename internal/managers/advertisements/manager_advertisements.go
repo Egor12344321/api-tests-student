@@ -55,3 +55,13 @@ func GetAdvertisementByID(t *testing.T, id string) models.AdvertisementDetails {
 
 	return result
 }
+
+
+func DeleteAdvertisement(t *testing.T, token, id string) {
+	raw := advertisements.HttpDeleteAdvertisement(t, token, id)
+	defer raw.Body.Close()
+
+	body, err := io.ReadAll(raw.Body)
+	require.NoError(t, err, "Не удалось прочитать ответ на удаление объявления")
+	require.Equalf(t, http.StatusNoContent, raw.StatusCode, "Удаление объявления %s. Тело ответа %s", id, body)
+}

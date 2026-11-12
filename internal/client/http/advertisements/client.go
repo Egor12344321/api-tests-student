@@ -39,3 +39,12 @@ func HttpGetAdvertisementByID(t *testing.T, id string) *http.Response {
 		Expect(t).
 		End().Response
 }
+
+// удаление объявления по ID.
+func HttpDeleteAdvertisement(t *testing.T, token, id string) *http.Response {
+	return apiRunner.GetRunner().Auth(token).Create().
+		Delete(path.AdvertisementPath).
+		Query("id", id).
+		Expect(t).
+		End().Response
+}
