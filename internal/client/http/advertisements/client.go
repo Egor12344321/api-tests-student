@@ -1,6 +1,7 @@
 package advertisements
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -45,6 +46,13 @@ func HttpDeleteAdvertisement(t *testing.T, token, id string) *http.Response {
 	return apiRunner.GetRunner().Auth(token).Create().
 		Delete(path.AdvertisementPath).
 		Query("id", id).
+		Expect(t).
+		End().Response
+}
+
+func HttpGetAdvertisementPhotos(t *testing.T, token, id string) *http.Response {
+	return apiRunner.GetRunner().Auth(token).Create().
+		Get(fmt.Sprintf(path.AdvertisementPhotosPath, id)).
 		Expect(t).
 		End().Response
 }

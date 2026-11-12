@@ -65,3 +65,17 @@ func DeleteAdvertisement(t *testing.T, token, id string) {
 	require.NoError(t, err, "Не удалось прочитать ответ на удаление объявления")
 	require.Equalf(t, http.StatusNoContent, raw.StatusCode, "Удаление объявления %s. Тело ответа %s", id, body)
 }
+
+func GetAdvertisementPhotos(t *testing.T, token, id string) []models.PhotoResponse {
+	raw := advertisements.HttpGetAdvertisementPhotos(t, token, id)
+	defer raw.Body.Close()
+
+	body, err := io.ReadAll(raw.Body)
+	require.NoError(t, err, "Не удалось прочитать ответ с фотографиями")
+	require.Equalf(t, http.StatusOK, raw.StatusCode, "Тело ответа %s", body)
+
+	var photoResponse []models.PhotoResponse
+	require.NoError(t, json.Unmarshal(body, &photoResponse), "Не удалось разобрать список фотографий")
+
+	return photoResponse
+}

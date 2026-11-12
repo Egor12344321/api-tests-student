@@ -9,7 +9,8 @@ type Advertisement struct {
 }
 
 type AdvertisementCreateResponse struct {
-	ID string `json:"id"`
+	ID     string          `json:"id"`
+	Photos []PhotoResponse `json:"photos"`
 }
 
 type AdvertisementDetails struct {
@@ -18,4 +19,9 @@ type AdvertisementDetails struct {
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`
 	Quantity    int     `json:"quantity"`
+}
+
+type PhotoResponse struct {
+	ID  string `json:"id"`
+	URL string `json:"url"`
 }
