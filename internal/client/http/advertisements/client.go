@@ -30,3 +30,12 @@ func HttpPostAdvertisement(t *testing.T, token string, fields map[string]string,
 
 	return response.End().Response
 }
+
+// получение объявления по его ID.
+func HttpGetAdvertisementByID(t *testing.T, id string) *http.Response {
+	return apiRunner.GetRunner().Create().
+		Get(path.AdvertisementPath).
+		Query("id", id).
+		Expect(t).
+		End().Response
+}
