@@ -34,11 +34,11 @@ func CreateAdvertisement(t *testing.T, token string, fields map[string]string, p
 	require.NoError(t, err, "Не удалось прочитать ответ на создание объявления")
 	require.Equalf(t, http.StatusCreated, raw.StatusCode, "Тело ответа %s", body)
 
-	var result models.AdvertisementCreateResponse
-	require.NoError(t, json.Unmarshal(body, &result), "Не удалось разобрать ответ на создание объявления")
-	require.NotEmpty(t, result.ID, "Сервер не вернул ID созданного объявления")
+	var advertisementCreateResponse models.AdvertisementCreateResponse
+	require.NoError(t, json.Unmarshal(body, &advertisementCreateResponse), "Не удалось разобрать ответ на создание объявления")
+	require.NotEmpty(t, advertisementCreateResponse.ID, "Сервер не вернул ID созданного объявления")
 
-	return result
+	return advertisementCreateResponse
 }
 
 
@@ -50,10 +50,10 @@ func GetAdvertisementByID(t *testing.T, id string) models.AdvertisementDetails {
 	require.NoError(t, err, "Не удалось прочитать ответ для объявления " + id)
 	require.Equalf(t, http.StatusOK, raw.StatusCode, "Тело ответа %s", body)
 
-	var result models.AdvertisementDetails
-	require.NoError(t, json.Unmarshal(body, &result), "Не удалось разобрать данные объявления")
+	var advertisementDetailsResponse models.AdvertisementDetails
+	require.NoError(t, json.Unmarshal(body, &advertisementDetailsResponse), "Не удалось разобрать данные объявления")
 
-	return result
+	return advertisementDetailsResponse
 }
 
 
