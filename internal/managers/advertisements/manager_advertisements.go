@@ -40,3 +40,18 @@ func CreateAdvertisement(t *testing.T, token string, fields map[string]string, p
 
 	return result
 }
+
+
+func GetAdvertisementByID(t *testing.T, id string) models.AdvertisementDetails {
+	raw := advertisements.HttpGetAdvertisementByID(t, id)
+	defer raw.Body.Close()
+
+	body, err := io.ReadAll(raw.Body)
+	require.NoError(t, err, "Не удалось прочитать ответ для объявления " + id)
+	require.Equalf(t, http.StatusOK, raw.StatusCode, "Тело ответа %s", body)
+
+	var result models.AdvertisementDetails
+	require.NoError(t, json.Unmarshal(body, &result), "Не удалось разобрать данные объявления")
+
+	return result
+}
