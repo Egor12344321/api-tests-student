@@ -5,6 +5,7 @@ type AdvertisementsList struct {
 }
 
 type Advertisement struct {
+	ID    string `json:"id"`
 	Title string `json:"title"`
 }
 

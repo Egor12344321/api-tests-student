@@ -50,6 +50,7 @@ func HttpDeleteAdvertisement(t *testing.T, token, id string) *http.Response {
 		End().Response
 }
 
+// HttpGetAdvertisementPhotos отправляет запрос на получение фотографий объявления.
 func HttpGetAdvertisementPhotos(t *testing.T, token, id string) *http.Response {
 	return apiRunner.GetRunner().Auth(token).Create().
 		Get(fmt.Sprintf(path.AdvertisementPhotosPath, id)).

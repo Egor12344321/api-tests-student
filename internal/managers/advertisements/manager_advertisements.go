@@ -3,8 +3,8 @@ package advertisements
 import (
 	"encoding/json"
 	"io"
-	"testing"
 	"net/http"
+	"testing"
 
 	"github.com/stretchr/testify/require"
 
@@ -25,7 +25,7 @@ func GetAdvertisementsList(t *testing.T, token, text string) models.Advertisemen
 	return advertisementsResponse
 }
 
-
+// CreateAdvertisement создаёт объявление и возвращает его ID и фотографии.
 func CreateAdvertisement(t *testing.T, token string, fields map[string]string, photoPaths []string) models.AdvertisementCreateResponse {
 	raw := advertisements.HttpPostAdvertisement(t, token, fields, photoPaths)
 	defer raw.Body.Close()
@@ -41,13 +41,13 @@ func CreateAdvertisement(t *testing.T, token string, fields map[string]string, p
 	return advertisementCreateResponse
 }
 
-
+// GetAdvertisementByID возвращает данные объявления по его ID.
 func GetAdvertisementByID(t *testing.T, id string) models.AdvertisementDetails {
 	raw := advertisements.HttpGetAdvertisementByID(t, id)
 	defer raw.Body.Close()
 
 	body, err := io.ReadAll(raw.Body)
-	require.NoError(t, err, "Не удалось прочитать ответ для объявления " + id)
+	require.NoError(t, err, "Не удалось прочитать ответ для объявления "+id)
 	require.Equalf(t, http.StatusOK, raw.StatusCode, "Тело ответа %s", body)
 
 	var advertisementDetailsResponse models.AdvertisementDetails
@@ -56,7 +56,7 @@ func GetAdvertisementByID(t *testing.T, id string) models.AdvertisementDetails {
 	return advertisementDetailsResponse
 }
 
-
+// DeleteAdvertisement удаляет объявление по его ID и проверяет статус ответа.
 func DeleteAdvertisement(t *testing.T, token, id string) {
 	raw := advertisements.HttpDeleteAdvertisement(t, token, id)
 	defer raw.Body.Close()
@@ -66,6 +66,7 @@ func DeleteAdvertisement(t *testing.T, token, id string) {
 	require.Equalf(t, http.StatusNoContent, raw.StatusCode, "Удаление объявления %s. Тело ответа %s", id, body)
 }
 
+// GetAdvertisementPhotos возвращает список фотографий объявления.
 func GetAdvertisementPhotos(t *testing.T, token, id string) []models.PhotoResponse {
 	raw := advertisements.HttpGetAdvertisementPhotos(t, token, id)
 	defer raw.Body.Close()
