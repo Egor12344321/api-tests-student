@@ -18,6 +18,13 @@ import (
 	base "api-tests-template/tests"
 )
 
+const (
+	description = "Описание тестового объявления"
+	price       = 1000
+	quantity    = 3
+	photoPath   = "fixtures/photoForCreateAdv.png"
+)
+
 type TestSuite struct {
 	suite.Suite
 	loginData models.LoginOkResponse
@@ -38,25 +45,27 @@ func (s *TestSuite) TearDownSuite() {
 	base.TearDownSuite()
 }
 
+// newAdvertisementFields возвращает корректные поля формы, чтобы использовать в негативных сценариях и они не влияли друг на друга, то есть каждый тест получит полностью заполненный adv и изменит какое-то поле под проверку
+func newAdvertisementFields() map[string]string {
+	return map[string]string{
+		"title":       "Тестовое объявление: " + utils.RandomString(12),
+		"description": description,
+		"price":       strconv.Itoa(price),
+		"quantity":    strconv.Itoa(quantity),
+	}
+}
+
+// проверка позитивного сценария добавления объявления с проверкой поиска по названию и проверкой доступности фото
 func (s *TestSuite) TestCreateAdvertisementPositive() {
 	const (
-		description    = "Описание тестового объявления"
-		price          = 1000
-		quantity       = 3
-		photoPath      = "fixtures/photoForCreateAdv.png"
 		searchAttempts = 5
 		searchInterval = 500 * time.Millisecond
 	)
 
 	t := s.T()
 	token := s.loginData.Token
-	title := "Тестовое объявление " + utils.RandomString(12)
-	fields := map[string]string{
-		"title":       title,
-		"description": description,
-		"price":       strconv.Itoa(price),
-		"quantity":    strconv.Itoa(quantity),
-	}
+	fields := newAdvertisementFields()
+	title := fields["title"]
 
 	var created advModels.AdvertisementCreateResponse
 	if !s.Run("Создаём объявление с фотографией", func() {
@@ -80,6 +89,7 @@ func (s *TestSuite) TestCreateAdvertisementPositive() {
 		require.Equal(s.T(), quantity, saved.Quantity, "Количество не совпадает")
 	})
 
+	// проверка появления объявления в поиске с пуллингом, чтобы объявление успело проиндексироваться, если используется соответствующая БД
 	s.Run("Находим объявление по полному названию", func() {
 		for attempt := 1; attempt <= searchAttempts; attempt++ {
 			list := advertisements.GetAdvertisementsList(s.T(), token, title)
@@ -94,7 +104,8 @@ func (s *TestSuite) TestCreateAdvertisementPositive() {
 			}
 		}
 
-		require.True(s.T(), false, "Объявление %s с названием %q не найдено за %d попыток", created.ID, title, searchAttempts)
+		require.True(s.T(), false, "Объявление %s с названием %q не найдено за %d попыток",
+			created.ID, title, searchAttempts)
 	})
 
 	s.Run("Проверяем загруженную фотографию", func() {
