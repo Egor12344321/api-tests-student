@@ -26,3 +26,8 @@ type PhotoResponse struct {
 	ID  string `json:"id"`
 	URL string `json:"url"`
 }
+
+type ErrorResponse struct {
+	Error   string `json:"error"`
+	Message string `json:"message"`
+}

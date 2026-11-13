@@ -27,18 +27,37 @@ func GetAdvertisementsList(t *testing.T, token, text string) models.Advertisemen
 
 // CreateAdvertisement создаёт объявление и возвращает его ID и фотографии.
 func CreateAdvertisement(t *testing.T, token string, fields map[string]string, photoPaths []string) models.AdvertisementCreateResponse {
+	body := postAdvertisement(t, token, fields, photoPaths, http.StatusCreated)
+
+	advertisementCreateResponse := models.AdvertisementCreateResponse{}
+	require.NoError(t, json.Unmarshal(body, &advertisementCreateResponse), "Не удалось разобрать ответ на создание объявления")
+	require.NotEmpty(t, advertisementCreateResponse.ID, "Сервер не вернул ID созданного объявления")
+
+	return advertisementCreateResponse
+}
+
+// CreateAdvertisementExpectError проверяет ожидаемый статус и возвращает ошибку API.
+func CreateAdvertisementExpectError(t *testing.T, token string, fields map[string]string, photoPaths []string, expectedStatusCode int) models.ErrorResponse {
+	body := postAdvertisement(t, token, fields, photoPaths, expectedStatusCode)
+
+	errorResponse := models.ErrorResponse{}
+	require.NoError(t, json.Unmarshal(body, &errorResponse), "Не удалось разобрать ответ с ошибкой")
+
+	return errorResponse
+}
+
+// postAdvertisement отправляет запрос на создание, читает тело и проверяет статус (вынес, чтобы переиспользовать код).
+func postAdvertisement(t *testing.T, token string, fields map[string]string, photoPaths []string, expectedStatusCode int) []byte {
+	t.Helper()
+
 	raw := advertisements.HttpPostAdvertisement(t, token, fields, photoPaths)
 	defer raw.Body.Close()
 
 	body, err := io.ReadAll(raw.Body)
 	require.NoError(t, err, "Не удалось прочитать ответ на создание объявления")
-	require.Equalf(t, http.StatusCreated, raw.StatusCode, "Тело ответа %s", body)
+	require.Equalf(t, expectedStatusCode, raw.StatusCode, "Тело ответа: %s", body)
 
-	var advertisementCreateResponse models.AdvertisementCreateResponse
-	require.NoError(t, json.Unmarshal(body, &advertisementCreateResponse), "Не удалось разобрать ответ на создание объявления")
-	require.NotEmpty(t, advertisementCreateResponse.ID, "Сервер не вернул ID созданного объявления")
-
-	return advertisementCreateResponse
+	return body
 }
 
 // GetAdvertisementByID возвращает данные объявления по его ID.
