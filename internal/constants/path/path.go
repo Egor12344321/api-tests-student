@@ -6,4 +6,6 @@ const (
 	AdvertisementsPath      = "/advertisements"
 	AdvertisementPath       = "/advertisement"
 	AdvertisementPhotosPath = "/advertisements/%s/photos"
+	FavoritesPath           = "/favorites"
+	FavoriteAdvertisementPath = "/favorites/%s"
 )

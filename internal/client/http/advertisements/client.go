@@ -57,3 +57,5 @@ func HttpGetAdvertisementPhotos(t *testing.T, token, id string) *http.Response {
 		Expect(t).
 		End().Response
 }
+
+
