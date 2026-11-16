@@ -49,7 +49,7 @@ func readFavoriteResponse(t *testing.T, raw *http.Response, expectedStatusCode i
 
 	body, err := io.ReadAll(raw.Body)
 	require.NoError(t, err, "Не удалось прочитать ответ избранного")
-	require.Equalf(t, expectedStatusCode, raw.StatusCode, "Тело ответа: %s", body)
+	require.Equalf(t, expectedStatusCode, raw.StatusCode, "HTTP status code должен быть %d. Тело ответа: %s", expectedStatusCode, body)
 
 	return body
 }
