@@ -9,3 +9,6 @@ type FavoriteListResponse struct {
 type FavoriteItem struct {
 	Advertisement advModels.Advertisement `json:"advertisement"`
 }
+
+// ErrorResponse содержит код и сообщение ошибки API.
+type ErrorResponse = advModels.ErrorResponse

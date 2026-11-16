@@ -53,3 +53,39 @@ func readFavoriteResponse(t *testing.T, raw *http.Response, expectedStatusCode i
 
 	return body
 }
+
+// GetFavoritesExpectError проверяет ожидаемый статус при чтении избранного.
+func GetFavoritesExpectError(t *testing.T, token, textForSearch string, expectedStatusCode int) models.ErrorResponse {
+	t.Helper()
+
+	raw := favorites.HttpGetFavorites(t, token, textForSearch)
+	return readFavoriteErrorResponse(t, raw, expectedStatusCode)
+}
+
+// AddFavoriteExpectError проверяет ожидаемый статус при добавлении в избранное.
+func AddFavoriteExpectError(t *testing.T, token, advertisementID string, expectedStatusCode int) models.ErrorResponse {
+	t.Helper()
+
+	request := models.AddFavoriteRequest{AdvertisementID: advertisementID}
+	raw := favorites.HttpPostFavorite(t, token, request)
+	return readFavoriteErrorResponse(t, raw, expectedStatusCode)
+}
+
+// DeleteFavoriteExpectError проверяет ожидаемый статус при удалении из избранного.
+func DeleteFavoriteExpectError(t *testing.T, token, advertisementID string, expectedStatusCode int) models.ErrorResponse {
+	t.Helper()
+
+	raw := favorites.HttpDeleteFavorite(t, token, advertisementID)
+	return readFavoriteErrorResponse(t, raw, expectedStatusCode)
+}
+
+// readFavoriteErrorResponse проверяет статус и разбирает тело ошибки.
+func readFavoriteErrorResponse(t *testing.T, raw *http.Response, expectedStatusCode int) models.ErrorResponse {
+	t.Helper()
+
+	body := readFavoriteResponse(t, raw, expectedStatusCode)
+	errorResponse := models.ErrorResponse{}
+	require.NoError(t, json.Unmarshal(body, &errorResponse), "Не удалось разобрать ответ с ошибкой избранного")
+
+	return errorResponse
+}
