@@ -12,7 +12,7 @@ import (
 
 func (s *TestSuite) TestFavoritesNonexistentAdvertisement() {
 	const (
-		advertisementID = "UnrealEgorsIdAdv"
+		advertisementID = "39960e58-db41-41ba-959e-01073a913692"
 		errorCode       = "not_found"
 	)
 
