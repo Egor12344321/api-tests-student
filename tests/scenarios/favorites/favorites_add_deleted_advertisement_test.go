@@ -3,8 +3,7 @@ package favorites
 import (
 	"net/http"
 
-	"github.com/stretchr/testify/require"
-
+	"api-tests-template/internal/assertions"
 	"api-tests-template/internal/managers/favorites"
 )
 
@@ -27,7 +26,6 @@ func (s *TestSuite) TestAddFavoriteDeletedAdvertisement() {
 
 		errorResponse := favorites.AddFavoriteExpectError(t, s.buyerLoginData.Token, advertisementID, expectedStatusCode)
 
-		require.Equal(t, "not_found", errorResponse.Error, "Некорректное значение error параметра")
-		require.Equal(t, "Advertisement not found", errorResponse.Message, "Некорректное значение message параметра")
+		assertions.CheckErrorResponse(t, errorResponse, "not_found", "Advertisement not found")
 	})
 }

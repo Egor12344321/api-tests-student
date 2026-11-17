@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/stretchr/testify/require"
-
+	"api-tests-template/internal/assertions"
 	"api-tests-template/internal/managers/advertisements"
 )
 
@@ -69,8 +68,7 @@ func (s *TestSuite) TestCreateAdvertisementInvalidFields() {
 				s.T(), s.loginData.Token, fields, advertisementPhotoPaths(tc.photoCount), http.StatusBadRequest,
 			)
 
-			require.Equal(s.T(), invalidRequest, errorResponse.Error, "Код ошибки не совпадает")
-			require.Equal(s.T(), tc.message, errorResponse.Message, "Сообщение об ошибке не совпадает")
+			assertions.CheckErrorResponse(s.T(), errorResponse, invalidRequest, tc.message)
 		})
 	}
 }

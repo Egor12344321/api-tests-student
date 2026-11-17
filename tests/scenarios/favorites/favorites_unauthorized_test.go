@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
+	"api-tests-template/internal/assertions"
 	"api-tests-template/internal/managers/favorites"
 	favModels "api-tests-template/internal/managers/favorites/models"
 
@@ -48,8 +47,7 @@ func TestFavoritesUnauthorized(t *testing.T) {
 			t.Run(endpoint.name+" "+tc.name, func(t *testing.T) {
 				errorResponse := endpoint.request(t, tc.token, endpoint.argument, expectedStatusCode)
 
-				require.Equal(t, errorCode, errorResponse.Error, "Некорректное значение error параметра")
-				require.Equal(t, tc.message, errorResponse.Message, "Некорректное значение message параметра")
+				assertions.CheckErrorResponse(t, errorResponse, errorCode, tc.message)
 			})
 		}
 	}

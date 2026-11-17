@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"api-tests-template/internal/assertions"
 	"api-tests-template/internal/managers/favorites"
 )
 
@@ -24,8 +25,7 @@ func (s *TestSuite) TestAddFavoriteDuplicate() {
 		t := s.T()
 		errorResponse := favorites.AddFavoriteExpectError(t, buyerToken, advertisement.ID, expectedStatusCode)
 
-		require.Equal(t, "already_exists", errorResponse.Error, "Некорректное значение error параметра")
-		require.Equal(t, "Advertisement is already in favorites", errorResponse.Message, "Некорректное значение message параметра")
+		assertions.CheckErrorResponse(t, errorResponse, "already_exists", "Advertisement is already in favorites")
 	}) {
 		return
 	}

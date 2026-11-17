@@ -3,8 +3,7 @@ package advertisementCreate
 import (
 	"net/http"
 
-	"github.com/stretchr/testify/require"
-
+	"api-tests-template/internal/assertions"
 	"api-tests-template/internal/managers/advertisements"
 )
 
@@ -33,8 +32,7 @@ func (s *TestSuite) TestCreateAdvertisementUnauthorized() {
 				s.T(), tc.token, fields, []string{photoPath}, http.StatusUnauthorized,
 			)
 
-			require.Equal(s.T(), unauthorizedError, errorResponse.Error, "Код ошибки не совпадает")
-			require.Equal(s.T(), tc.message, errorResponse.Message, "Сообщение об ошибке не совпадает")
+			assertions.CheckErrorResponse(s.T(), errorResponse, unauthorizedError, tc.message)
 		})
 	}
 }

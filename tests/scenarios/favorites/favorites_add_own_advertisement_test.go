@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"api-tests-template/internal/assertions"
 	"api-tests-template/internal/managers/favorites"
 )
 
@@ -22,8 +23,7 @@ func (s *TestSuite) TestAddFavoriteOwnAdvertisement() {
 		t := s.T()
 		errorResponse := favorites.AddFavoriteExpectError(t, ownerToken, advertisement.ID, expectedStatusCode)
 
-		require.Equal(t, "forbidden", errorResponse.Error, "Некорректное значение error параметра")
-		require.Equal(t, "Cannot add own advertisement to favorites", errorResponse.Message, "Некорректное значение message параметра")
+		assertions.CheckErrorResponse(t, errorResponse, "forbidden", "Cannot add own advertisement to favorites")
 	}) {
 		return
 	}

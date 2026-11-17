@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
+	"api-tests-template/internal/assertions"
 	"api-tests-template/internal/managers/favorites"
 	favModels "api-tests-template/internal/managers/favorites/models"
 )
@@ -36,8 +35,7 @@ func (s *TestSuite) TestFavoritesNonexistentAdvertisement() {
 			t := s.T()
 			errorResponse := tc.request(t, s.buyerLoginData.Token, advertisementID, expectedStatusCode)
 
-			require.Equal(t, errorCode, errorResponse.Error, "Некорректное значение error параметра")
-			require.Equal(t, tc.message, errorResponse.Message, "Некорректное значение message параметра")
+			assertions.CheckErrorResponse(t, errorResponse, errorCode, tc.message)
 		})
 	}
 }
