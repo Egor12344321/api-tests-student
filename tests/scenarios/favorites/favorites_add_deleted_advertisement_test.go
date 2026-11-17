@@ -27,7 +27,7 @@ func (s *TestSuite) TestAddFavoriteDeletedAdvertisement() {
 
 		errorResponse := favorites.AddFavoriteExpectError(t, s.buyerLoginData.Token, advertisementID, expectedStatusCode)
 
-		require.Equal(t, "not_found", errorResponse.Error,"Некорректное значение error параметра")
+		require.Equal(t, "not_found", errorResponse.Error, "Некорректное значение error параметра")
 		require.Equal(t, "Advertisement not found", errorResponse.Message, "Некорректное значение message параметра")
 	})
 }
