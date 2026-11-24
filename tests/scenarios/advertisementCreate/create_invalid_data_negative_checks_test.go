@@ -43,21 +43,27 @@ func (s *TestSuite) TestCreateAdvertisementInvalidFields() {
 		{"Цена −100 (негативный, класс эквивалентности, цена ниже 0)", "price", "-100", false, 1, priceRangeError},
 		{"Цена 1000001 (негативный, граничное значение с шагом 1, максимум 1000000)", "price", "1000001", false, 1, priceRangeError},
 		{"Цена 1500000 (негативный, класс эквивалентности, цена выше 1000000)", "price", "1500000", false, 1, priceRangeError},
+		{"Цена задана текстом", "price", "abc", false, 1, "cannot convert string value abc to float"},
 
 		{"Количество 0 (негативный, граничное значение, минимум 1)", "quantity", "0", false, 1, quantityRangeError},
 		{"Количество −10 (негативный, класс эквивалентности, количество меньше 1)", "quantity", "-10", false, 1, quantityRangeError},
 		{"Количество 101 (негативный, граничное значение, максимум 100)", "quantity", "101", false, 1, quantityRangeError},
 		{"Количество 150 (негативный, класс эквивалентности, количество больше 100)", "quantity", "150", false, 1, quantityRangeError},
+		{"Количество задано текстом", "quantity", "abc", false, 1, "cannot convert string value to int"},
 
 		{"0 фотографий (негативный, граничное значение, минимум 1 файл)", "", "", false, 0, photoRequired},
 		{"4 фотографии (негативный, граничное значение, максимум 3 файла)", "", "", false, 4, photoLimitError},
 		{"5 фотографий (негативный, класс эквивалентности, больше 3 файлов)", "", "", false, 5, photoLimitError},
+		{"Неподдерживаемый формат фотографии", "photos", "fixtures/unsupportedPhoto.txt", false, 1, `photo 1: file type not allowed: extension ".txt"`},
 	}
 
 	for _, tc := range cases {
 		s.Run(tc.name, func() {
 			fields := newAdvertisementFields()
-			if tc.omitField {
+			photoPaths := advertisementPhotoPaths(tc.photoCount)
+			if tc.field == "photos" {
+				photoPaths = []string{tc.value}
+			} else if tc.omitField {
 				delete(fields, tc.field)
 			} else if tc.field != "" {
 				fields[tc.field] = tc.value
@@ -65,7 +71,7 @@ func (s *TestSuite) TestCreateAdvertisementInvalidFields() {
 
 			s.T().Log("Отправляем запрос и ожидаем HTTP 400")
 			errorResponse := advertisements.CreateAdvertisementExpectError(
-				s.T(), s.loginData.Token, fields, advertisementPhotoPaths(tc.photoCount), http.StatusBadRequest,
+				s.T(), s.loginData.Token, fields, photoPaths, http.StatusBadRequest,
 			)
 
 			assertions.CheckErrorResponse(s.T(), errorResponse, invalidRequest, tc.message)
