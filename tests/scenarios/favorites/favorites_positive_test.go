@@ -7,11 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"api-tests-template/internal/managers/advertisements"
 	"api-tests-template/internal/managers/auth"
 	"api-tests-template/internal/managers/auth/models"
 	"api-tests-template/internal/managers/favorites"
-	"api-tests-template/internal/utils"
 
 	base "api-tests-template/tests"
 )
@@ -48,52 +46,46 @@ func (s *TestSuite) TearDownSuite() {
 }
 
 func (s *TestSuite) TestFavoritesPositive() {
-	t := s.T()
 	ownerToken := s.ownerLoginData.Token
 	buyerToken := s.buyerLoginData.Token
-	title := "Избранное " + utils.RandomString(12)
-	fields := map[string]string{
-		"title":       title,
-		"description": "Объявление для проверки избранного",
-		"price":       "1000",
-		"quantity":    "3",
-	}
 
-	t.Log("Владелец создаёт объявление")
-	created := advertisements.CreateAdvertisement(t, ownerToken, fields, []string{photoPath})
-	advertisementDeleted := false
-	t.Cleanup(func() {
-		if !advertisementDeleted {
-			t.Logf("Удаляем тестовое объявление %s", created.ID)
-			advertisements.DeleteAdvertisement(t, ownerToken, created.ID)
+	var advertisementID, title string
+
+	if !s.Run("Работаем с объявлением в избранном", func() {
+		created := createAdvertisementForFavorites(s.T(), ownerToken)
+		advertisementID = created.ID
+		title = created.Title
+
+		if !s.Run("Добавляем объявление в избранное и находим его в списке", func() {
+			t := s.T()
+			favorites.AddFavorite(t, buyerToken, created.ID)
+			require.True(t, advertisementInFavorites(t, buyerToken, title, created.ID), "Объявление %s не появилось в избранном", created.ID)
+		}) {
+			return
 		}
-	})
 
-	if !s.Run("Добавляем объявление в избранное и находим его в списке", func() {
-		t := s.T()
-		favorites.AddFavorite(t, buyerToken, created.ID)
-		require.True(t, advertisementInFavorites(t, buyerToken, title, created.ID), "Объявление %s не появилось в избранном", created.ID)
+		if !s.Run("Удаляем объявление из избранного и проверяем список", func() {
+			t := s.T()
+			favorites.DeleteFavorite(t, buyerToken, created.ID)
+			require.False(t, advertisementInFavorites(t, buyerToken, title, created.ID), "Объявление %s осталось в списке после удаления из избранного", created.ID)
+		}) {
+			return
+		}
+
+		s.Run("Добавляем объявление обратно в избранное", func() {
+			t := s.T()
+			favorites.AddFavorite(t, buyerToken, created.ID)
+			require.True(t, advertisementInFavorites(t, buyerToken, title, created.ID),
+				"Объявление %s не появилось после повторного добавления", created.ID)
+		})
 	}) {
 		return
 	}
 
-	if !s.Run("Удаляем объявление из избранного и проверяем список", func() {
+	s.Run("Проверяем избранное после удаления самого объявления", func() {
 		t := s.T()
-		favorites.DeleteFavorite(t, buyerToken, created.ID)
-		require.False(t, advertisementInFavorites(t, buyerToken, title, created.ID), "Объявление %s осталось в списке после удаления из избранного", created.ID)
-	}) {
-		return
-	}
-
-	s.Run("Удаляем само объявление и проверяем список избранного", func() {
-		t := s.T()
-		favorites.AddFavorite(t, buyerToken, created.ID)
-		require.True(t, advertisementInFavorites(t, buyerToken, title, created.ID), "Объявление %s не появилось после повторного добавления", created.ID)
-
-		advertisements.DeleteAdvertisement(t, ownerToken, created.ID)
-		advertisementDeleted = true
-
-		require.False(t, advertisementInFavorites(t, buyerToken, title, created.ID), "Объявление %s осталось в избранном после удаления самого объявления", created.ID)
+		require.False(t, advertisementInFavorites(t, buyerToken, title, advertisementID),
+			"Объявление %s осталось в избранном после удаления самого объявления", advertisementID)
 	})
 }
 
